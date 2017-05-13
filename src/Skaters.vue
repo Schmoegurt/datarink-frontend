@@ -1,13 +1,13 @@
 <template>
   <div>
-    <h3>Foo</h3>
+    <h3>Skaters</h3>
     <p>{{ message }}</p>
   </div>
 </template>
 
 <script>
 module.exports = {
-  name: 'Foo',
+  name: 'Skaters',
   data: () => ({
     message: '',
   }),

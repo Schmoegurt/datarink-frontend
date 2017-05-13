@@ -1,15 +1,15 @@
 <template>
   <div>
-    <h3>Bar</h3>
+    <h3>Teams</h3>
     <p>{{ message }}</p>
   </div>
 </template>
 
 <script>
 module.exports = {
-  name: 'Bar',
+  name: 'Teams',
   data: () => ({
-    message: 'Hello Bar!',
+    message: 'Hello teams!',
   }),
 };
 </script>

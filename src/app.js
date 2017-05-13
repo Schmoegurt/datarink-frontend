@@ -2,15 +2,15 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 
 import App from './App.vue';
-import Foo from './Foo.vue';
-import Bar from './Bar.vue';
+import Skaters from './Skaters.vue';
+import Teams from './Teams.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
-  { path: '/', redirect: '/foo' },
-  { path: '/foo', component: Foo },
-  { path: '/bar', component: Bar },
+  { path: '/', redirect: '/skaters' },
+  { path: '/skaters', component: Skaters },
+  { path: '/teams', component: Teams },
 ];
 
 const router = new VueRouter({
