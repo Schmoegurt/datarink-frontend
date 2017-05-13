@@ -17,6 +17,7 @@
     font-size: $fs-1;
     line-height: $lh-copy;
     color: $gray-dk;
+    margin: $ws-lg;
   }
 
   h1 {

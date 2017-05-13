@@ -1,17 +1,34 @@
 $font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
+/**
+ * Font sizes
+ */
 $fs-0: 0.875rem;
 $fs-1: 1.125rem;
 $fs-2: 1.625rem;
 $fs-3: 2.375rem;
 $fs-4: 3.375rem;
 
+/**
+ * Line height
+ */
 $lh-title: 1.25;
 $lh-copy: 1.5;
 $lh-solid: 1;
 
+/**
+ * White space: used for paddings and margins
+ */
+$ws-sm: 0.5rem;
 $ws-md: 1rem;
+$ws-lg: 2rem;
 
+/**
+ * Grays
+ */
 $gray-dk: #333;
 
+/**
+ * Blues
+ */
 $blue-md: #2d74da;
