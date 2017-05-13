@@ -60,7 +60,7 @@ module.exports = {
           [].slice.call(self.tbody.querySelectorAll('tr > td:first-child'))
             // eslint-disable-next-line no-param-reassign
             .forEach(td => (td.style.transform = hTransform));
-        }, 500);
+        }, 300);
       }
     }
     container.addEventListener('scroll', scrollThrottler, false);

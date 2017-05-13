@@ -30,9 +30,9 @@ module.exports = {
         { id: 'i_eff_pen_drawn', display: 'Pen drawn' },
         { id: 'i_eff_pen_taken', display: 'Pen taken' },
         { id: 'penDiff', display: 'Pen diff' },
-        { id: 'iFoWinPct', display: 'FO win%'},
-        { id: 'i_fo_won', display: 'FO won'},
-        { id: 'i_fo_lost', display: 'FO lost'},
+        { id: 'iFoWinPct', display: 'FO win%' },
+        { id: 'i_fo_won', display: 'FO won' },
+        { id: 'i_fo_lost', display: 'FO lost' },
         { id: 'i_blocked', display: 'Blocked' },
         { id: 'gf', display: 'GF' },
         { id: 'ga', display: 'GA' },
@@ -71,19 +71,19 @@ module.exports = {
             r.name = `${r.first_name} ${r.last_name}`;
             r.mins = Math.round(r.toi / 60);
             r.ip = r.ig + r.ia1 + r.ia2;
-            r.iShPct = r.isog === 0 ? 0 : Math.round(1000 * r.ig / r.isog) / 10;
+            r.iShPct = r.isog === 0 ? 0 : Math.round(1000 * (r.ig / r.isog)) / 10;
             r.penDiff = r.i_eff_pen_drawn - r.i_eff_pen_taken;
             r.iFoWinPct = r.i_fo_won + r.i_fo_lost === 0 ? 0
-              : Math.round(1000 * r.i_fo_won / (r.i_fo_won + r.i_fo_lost)) / 10;
-            r.gfPct = r.gf + r.ga === 0 ? 0 : Math.round(1000 * r.gf / (r.gf + r.ga)) / 10;
-            r.cfPct = r.cf + r.ca === 0 ? 0 : Math.round(1000 * r.cf / (r.cf + r.ca)) / 10;
+              : Math.round(1000 * (r.i_fo_won / (r.i_fo_won + r.i_fo_lost))) / 10;
+            r.gfPct = r.gf + r.ga === 0 ? 0 : Math.round(1000 * (r.gf / (r.gf + r.ga))) / 10;
+            r.cfPct = r.cf + r.ca === 0 ? 0 : Math.round(1000 * (r.cf / (r.cf + r.ca))) / 10;
             r.cfPctAdj = r.adj_cf + r.adj_ca === 0 ? 0
-              : Math.round(1000 * r.adj_cf / (r.adj_cf + r.adj_ca)) / 10;
-            r.shPct = r.sf === 0 ? 0 : Math.round(1000 * r.gf / r.sf) / 10;
+              : Math.round(1000 * (r.adj_cf / (r.adj_cf + r.adj_ca))) / 10;
+            r.shPct = r.sf === 0 ? 0 : Math.round(1000 * (r.gf / r.sf)) / 10;
             r.svPct = r.sa === 0 ? 0 : Math.round(1000 * (1 - (r.ga / r.sa))) / 10;
             r.pdo = Math.round(10 * (r.shPct + r.svPct)) / 10;
-            r.ofoPct = Math.round(1000 * r.ofo / (r.ofo + r.dfo + r.nfo + r.otf)) / 10;
-            r.dfoPct = Math.round(1000 * r.dfo / (r.ofo + r.dfo + r.nfo + r.otf)) / 10;
+            r.ofoPct = Math.round(1000 * (r.ofo / (r.ofo + r.dfo + r.nfo + r.otf))) / 10;
+            r.dfoPct = Math.round(1000 * (r.dfo / (r.ofo + r.dfo + r.nfo + r.otf))) / 10;
 
             // Round adjusted corsi after calculating adjusted cfPct
             r.adj_cf = Math.round(r.adj_cf);
