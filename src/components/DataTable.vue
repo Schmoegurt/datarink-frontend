@@ -1,14 +1,14 @@
 <template>
   <div class="fixed-table-container">
-    <table v-if="columns.length > 0">
+    <table v-if="rows && rows.length > 0">
       <thead>
         <tr>
-          <th v-for="c in columns">{{ c }}</th>
+          <th v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }">{{ c.display }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="r in rows">
-          <td v-for="c in columns">{{ r[c] }}</td>
+          <td v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }">{{ r[c.id] }}</td>
         </tr>
       </tbody>
     </table>
@@ -19,8 +19,8 @@
 module.exports = {
   name: 'DataTable',
   props: {
-    rows: Array,
     columns: Array,
+    rows: Array,
   },
   data() {
     return {
@@ -176,8 +176,8 @@ module.exports = {
   .fixed-table-container td {
     border-right: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
-    padding: 8px;
-    text-align: left;
+    padding: 4px 8px;
+    text-align: right;
     vertical-align: top;
     font-size: 14px;
 
@@ -203,5 +203,9 @@ module.exports = {
   .fixed-table-container th:last-child,
   .fixed-table-container td:last-child {
     border-right: 0;
+  }
+  .fixed-table-container th.left-aligned,
+  .fixed-table-container td.left-aligned {
+    text-align: left;
   }
 </style>
