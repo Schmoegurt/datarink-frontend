@@ -1,18 +1,32 @@
 <template>
   <div>
     <h3>Skaters</h3>
-    <p>{{ message }}</p>
+    <p>{{ skaters }}</p>
   </div>
 </template>
 
 <script>
 module.exports = {
   name: 'Skaters',
-  data: () => ({
-    message: '',
-  }),
-  created: function created() {
-    this.message = [1, 2, 3].map(d => 2 * d);
+  data: function () {
+    return {
+      skaters: ['empty'],
+    };
+  },
+  created: function() {
+    this.fetchData();
+  },
+  methods: {
+    fetchData: function () {
+      const self = this;
+      const xhr = new XMLHttpRequest();
+      const route = '/skaters/?start=20151010&end=20160510&strSits=ev5';
+      xhr.open('GET', `${API_URL}${route}`);
+      xhr.onload = function () {
+        self.skaters = JSON.parse(xhr.responseText).skaters;
+      }
+      xhr.send();
+    }
   },
 };
 </script>
