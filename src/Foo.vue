@@ -12,7 +12,7 @@ module.exports = {
     message: '',
   }),
   created: function created() {
-    this.message = 'Hi';
+    this.message = [1, 2, 3].map(d => 2 * d);
   },
 };
 </script>
