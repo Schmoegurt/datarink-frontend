@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height: 100%; position: relative;">
     <nav>
       <router-link to='/skaters'>Skaters</router-link>
       <router-link to='/teams'>Teams</router-link>
@@ -12,12 +12,19 @@
   @import '~normalize.css/normalize.css';
   @import "variables";
 
+  html {
+    height: 100%;
+  }
+
   body {
     font-family: $font-stack;
     font-size: $fs-1;
     line-height: $lh-copy;
     color: $gray-dk;
-    margin: $ws-lg;
+    padding: $ws-lg;
+    height: 100%;
+    position: relative;
+    box-sizing: border-box;
   }
 
   h1 {

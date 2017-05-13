@@ -181,10 +181,8 @@ module.exports = {
 
 <style>
   .fixed-table-container {
-    height: 400px;
     box-sizing: border-box;
     border: 1px solid #ccc;
-    margin-bottom: 40px;
     overflow: auto;
     position: relative;
   }
