@@ -1,6 +1,17 @@
 <template>
-  <div>
-    <p>{{ size }} skaters</p>
+  <div class="fixed-table-container">
+    <table v-if="columns.length > 0">
+      <thead>
+        <tr>
+          <th v-for="c in columns">{{ c }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="r in tableData">
+          <td v-for="c in columns">{{ r[c] }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -10,10 +21,208 @@ module.exports = {
   props: {
     tableData: Array,
   },
+  data() {
+    return {
+      // Store references to table elements
+      thead: null,
+      tbody: null,
+    }
+  },
+  updated() {
+    this.thead = this.$el.querySelector('thead');
+    this.tbody = this.$el.querySelector('tbody');
+    this.relayout();
+
+    const container = this.$el;
+    const self = this;
+
+    // Update table cell dimensions on resize
+    window.addEventListener('resize', resizeThrottler, false);
+    var resizeTimeout;
+    function resizeThrottler() {
+      if (!resizeTimeout) {
+        resizeTimeout = setTimeout(function() {
+          resizeTimeout = null;
+          self.relayout();
+        }, 500);
+      }
+    }
+
+    // Fix thead and first column on scroll
+    container.addEventListener('scroll', scrollThrottler, false);
+    var scrollTimeout;
+    function scrollThrottler() {
+      if (!scrollTimeout) {
+        scrollTimeout = setTimeout(function() {
+          scrollTimeout = null;
+          self.thead.style.transform = 'translate3d(0,' + container.scrollTop + 'px,0)';
+          var hTransform = 'translate3d(' + container.scrollLeft + 'px,0,0)';
+          self.thead.querySelector('th').style.transform = hTransform;
+          [].slice.call(self.tbody.querySelectorAll('tr > td:first-child'))
+            .forEach(function(td, i) {
+              td.style.transform = hTransform;
+            });
+        }, 500);
+      }
+    }
+
+    /*
+    container.addEventListener('scroll', function() {
+      self.thead.style.transform = 'translate3d(0,' + this.scrollTop + 'px,0)';
+      var hTransform = 'translate3d(' + this.scrollLeft + 'px,0,0)';
+      self.thead.querySelector('th').style.transform = hTransform;
+      [].slice.call(self.tbody.querySelectorAll('tr > td:first-child'))
+        .forEach(function(td, i) {
+          td.style.transform = hTransform;
+        });
+    });
+    */
+
+  },
   computed: {
-    size() {
-      return this.tableData.length;
+    columns() {
+      return this.tableData.length > 0 ? Object.keys(this.tableData[0]) : [];
+    },
+  },
+  methods: {
+    // Add inline styles to fix the header row and leftmost column
+    relayout() {
+      const thead = this.thead;
+      const tbody = this.tbody;
+      const ths = [].slice.call(thead.querySelectorAll('th'));
+      const tbodyTrs = [].slice.call(tbody.querySelectorAll('tr'));
+      /**
+       * Remove inline styles so we resort to the default table layout algorithm
+       * For thead, th, and td elements, don't remove the 'transform' styles applied
+       * by the scroll event listener
+       */
+      tbody.setAttribute('style', '');
+      thead.style.width = '';
+      thead.style.position = '';
+      thead.style.top = '';
+      thead.style.left = '';
+      thead.style.zIndex = '';
+      ths.forEach(function(th) {
+        th.style.display = '';
+        th.style.width = '';
+        th.style.position = '';
+        th.style.top = '';
+        th.style.left = '';
+      });
+      tbodyTrs.forEach(function(tr) {
+        tr.setAttribute('style', '');
+      });
+      [].slice.call(tbody.querySelectorAll('td'))
+        .forEach(function(td) {
+          td.style.width = '';
+          td.style.position = '';
+          td.style.left = '';
+        });
+
+      /**
+       * Store width and height of each th
+       * getBoundingClientRect()'s dimensions include paddings and borders
+       */
+      const thStyles = ths.map(function(th) {
+        const rect = th.getBoundingClientRect();
+        const style = document.defaultView.getComputedStyle(th, '');
+        return {
+          boundingWidth: rect.width,
+          boundingHeight: rect.height,
+          width: parseInt(style.width, 10),
+          paddingLeft: parseInt(style.paddingLeft, 10)
+        };
+      });
+
+      // Set widths of thead and tbody
+      const totalWidth = thStyles.reduce(function(sum, cur) {
+        return sum + cur.boundingWidth;
+      }, 0);
+      tbody.style.display = 'block';
+      tbody.style.width = totalWidth + 'px';
+      thead.style.width = totalWidth - thStyles[0].boundingWidth + 'px';
+
+      // Position thead
+      thead.style.position = 'absolute';
+      thead.style.top = '0';
+      thead.style.left = thStyles[0].boundingWidth + 'px';
+      thead.style.zIndex = 10;
+
+      // Set widths of the th elements in thead. For the fixed th, set its position
+      ths.forEach(function(th, i) {
+        th.style.width = thStyles[i].width + 'px';
+        if (i === 0) {
+          th.style.position = 'absolute';
+          th.style.top = '0';
+          th.style.left = -thStyles[0].boundingWidth + 'px';
+        }
+      });
+
+      // Set margin-top for tbody - the fixed header is displayed in this margin
+      tbody.style.marginTop = thStyles[0].boundingHeight + 'px';
+
+      // Set widths of the td elements in tbody. For the fixed td, set its position
+      tbodyTrs.forEach(function(tr, i) {
+        tr.style.display = 'block';
+        tr.style.paddingLeft = thStyles[0].boundingWidth + 'px';
+        [].slice.call(tr.querySelectorAll('td'))
+          .forEach(function(td, j) {
+            td.style.width = thStyles[j].width + 'px';
+            if (j === 0) {
+              td.style.position = 'absolute';
+              td.style.left = '0';
+            }
+          });
+      });
     },
   },
 };
 </script>
+
+<style>
+  .fixed-table-container {
+    height: 400px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    margin-bottom: 40px;
+    overflow: auto;
+    position: relative;
+  }
+
+  .fixed-table-container table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  .fixed-table-container th,
+  .fixed-table-container td {
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+    vertical-align: top;
+    font-size: 14px;
+
+    /**
+      * Current implementation doesn't work when
+      * cells in a row have different heights
+      */
+    white-space: nowrap !important;
+  }
+  .fixed-table-container th {
+    background: #eee;
+    font-size: 12px;
+    line-height: 16px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .fixed-table-container td:first-child {
+    background: #eee;
+  }
+  .fixed-table-container tr:last-child td {
+    border-bottom: 0;
+  }
+  .fixed-table-container th:last-child,
+  .fixed-table-container td:last-child {
+    border-right: 0;
+  }
+</style>
