@@ -1,32 +1,35 @@
 <template>
   <div>
     <h3>Skaters</h3>
-    <p>{{ skaters }}</p>
+    <DataTable :tableData="skaters"></DataTable>
   </div>
 </template>
 
 <script>
+const DataTable = require('./components/DataTable.vue');
+
 module.exports = {
   name: 'Skaters',
-  data: function () {
+  components: {
+    DataTable,
+  },
+  data() {
     return {
-      skaters: ['empty'],
+      skaters: [],
     };
   },
-  created: function() {
+  created() {
     this.fetchData();
   },
   methods: {
-    fetchData: function () {
+    fetchData() {
       const self = this;
       const xhr = new XMLHttpRequest();
       const route = '/skaters/?start=20151010&end=20160510&strSits=ev5';
       xhr.open('GET', `${API_URL}${route}`);
-      xhr.onload = function () {
-        self.skaters = JSON.parse(xhr.responseText).skaters;
-      }
+      xhr.onload = () => (self.skaters = JSON.parse(xhr.responseText).skaters);
       xhr.send();
-    }
+    },
   },
 };
 </script>
