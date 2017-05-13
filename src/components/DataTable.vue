@@ -7,7 +7,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="r in tableData">
+        <tr v-for="r in rows">
           <td v-for="c in columns">{{ r[c] }}</td>
         </tr>
       </tbody>
@@ -19,78 +19,62 @@
 module.exports = {
   name: 'DataTable',
   props: {
-    tableData: Array,
+    rows: Array,
+    columns: Array,
   },
   data() {
     return {
       // Store references to table elements
       thead: null,
       tbody: null,
-    }
+    };
   },
   updated() {
-    this.thead = this.$el.querySelector('thead');
-    this.tbody = this.$el.querySelector('tbody');
+    const self = this;
+    const container = this.$el;
+    this.thead = container.querySelector('thead');
+    this.tbody = container.querySelector('tbody');
     this.relayout();
 
-    const container = this.$el;
-    const self = this;
-
-    // Update table cell dimensions on resize
-    window.addEventListener('resize', resizeThrottler, false);
-    var resizeTimeout;
+    // On resize, update table cell dimensions
+    let resizeTimeout;
     function resizeThrottler() {
       if (!resizeTimeout) {
-        resizeTimeout = setTimeout(function() {
+        resizeTimeout = setTimeout(() => {
           resizeTimeout = null;
           self.relayout();
         }, 500);
       }
     }
+    window.addEventListener('resize', resizeThrottler, false);
 
-    // Fix thead and first column on scroll
-    container.addEventListener('scroll', scrollThrottler, false);
-    var scrollTimeout;
+    // On scroll, fix thead and first column
+    let scrollTimeout;
     function scrollThrottler() {
       if (!scrollTimeout) {
-        scrollTimeout = setTimeout(function() {
+        scrollTimeout = setTimeout(() => {
           scrollTimeout = null;
-          self.thead.style.transform = 'translate3d(0,' + container.scrollTop + 'px,0)';
-          var hTransform = 'translate3d(' + container.scrollLeft + 'px,0,0)';
+          self.thead.style.transform = `translate3d(0,${container.scrollTop}px,0)`;
+          const hTransform = `translate3d(${container.scrollLeft}px,0,0)`;
           self.thead.querySelector('th').style.transform = hTransform;
           [].slice.call(self.tbody.querySelectorAll('tr > td:first-child'))
-            .forEach(function(td, i) {
-              td.style.transform = hTransform;
-            });
+            // eslint-disable-next-line no-param-reassign
+            .forEach(td => (td.style.transform = hTransform));
         }, 500);
       }
     }
-
-    /*
-    container.addEventListener('scroll', function() {
-      self.thead.style.transform = 'translate3d(0,' + this.scrollTop + 'px,0)';
-      var hTransform = 'translate3d(' + this.scrollLeft + 'px,0,0)';
-      self.thead.querySelector('th').style.transform = hTransform;
-      [].slice.call(self.tbody.querySelectorAll('tr > td:first-child'))
-        .forEach(function(td, i) {
-          td.style.transform = hTransform;
-        });
-    });
-    */
-
-  },
-  computed: {
-    columns() {
-      return this.tableData.length > 0 ? Object.keys(this.tableData[0]) : [];
-    },
+    container.addEventListener('scroll', scrollThrottler, false);
   },
   methods: {
     // Add inline styles to fix the header row and leftmost column
     relayout() {
+      // Allow parameter reassignment so we can set element styles
+      /* eslint-disable no-param-reassign */
       const thead = this.thead;
       const tbody = this.tbody;
       const ths = [].slice.call(thead.querySelectorAll('th'));
       const tbodyTrs = [].slice.call(tbody.querySelectorAll('tr'));
+
       /**
        * Remove inline styles so we resort to the default table layout algorithm
        * For thead, th, and td elements, don't remove the 'transform' styles applied
@@ -102,18 +86,16 @@ module.exports = {
       thead.style.top = '';
       thead.style.left = '';
       thead.style.zIndex = '';
-      ths.forEach(function(th) {
+      ths.forEach((th) => {
         th.style.display = '';
         th.style.width = '';
         th.style.position = '';
         th.style.top = '';
         th.style.left = '';
       });
-      tbodyTrs.forEach(function(tr) {
-        tr.setAttribute('style', '');
-      });
+      tbodyTrs.forEach(tr => (tr.setAttribute('style', '')));
       [].slice.call(tbody.querySelectorAll('td'))
-        .forEach(function(td) {
+        .forEach((td) => {
           td.style.width = '';
           td.style.position = '';
           td.style.left = '';
@@ -123,57 +105,56 @@ module.exports = {
        * Store width and height of each th
        * getBoundingClientRect()'s dimensions include paddings and borders
        */
-      const thStyles = ths.map(function(th) {
+      const thStyles = ths.map((th) => {
         const rect = th.getBoundingClientRect();
         const style = document.defaultView.getComputedStyle(th, '');
         return {
           boundingWidth: rect.width,
           boundingHeight: rect.height,
           width: parseInt(style.width, 10),
-          paddingLeft: parseInt(style.paddingLeft, 10)
+          paddingLeft: parseInt(style.paddingLeft, 10),
         };
       });
 
       // Set widths of thead and tbody
-      const totalWidth = thStyles.reduce(function(sum, cur) {
-        return sum + cur.boundingWidth;
-      }, 0);
+      const totalWidth = thStyles.reduce((sum, cur) => sum + cur.boundingWidth, 0);
       tbody.style.display = 'block';
-      tbody.style.width = totalWidth + 'px';
-      thead.style.width = totalWidth - thStyles[0].boundingWidth + 'px';
+      tbody.style.width = `${totalWidth}px`;
+      thead.style.width = `${totalWidth - thStyles[0].boundingWidth}px`;
 
       // Position thead
       thead.style.position = 'absolute';
       thead.style.top = '0';
-      thead.style.left = thStyles[0].boundingWidth + 'px';
+      thead.style.left = `${thStyles[0].boundingWidth}px`;
       thead.style.zIndex = 10;
 
       // Set widths of the th elements in thead. For the fixed th, set its position
-      ths.forEach(function(th, i) {
-        th.style.width = thStyles[i].width + 'px';
+      ths.forEach((th, i) => {
+        th.style.width = `${thStyles[i].width}px`;
         if (i === 0) {
           th.style.position = 'absolute';
           th.style.top = '0';
-          th.style.left = -thStyles[0].boundingWidth + 'px';
+          th.style.left = `${-thStyles[0].boundingWidth}px`;
         }
       });
 
       // Set margin-top for tbody - the fixed header is displayed in this margin
-      tbody.style.marginTop = thStyles[0].boundingHeight + 'px';
+      tbody.style.marginTop = `${thStyles[0].boundingHeight}px`;
 
       // Set widths of the td elements in tbody. For the fixed td, set its position
-      tbodyTrs.forEach(function(tr, i) {
+      tbodyTrs.forEach((tr) => {
         tr.style.display = 'block';
-        tr.style.paddingLeft = thStyles[0].boundingWidth + 'px';
+        tr.style.paddingLeft = `${thStyles[0].boundingWidth}px`;
         [].slice.call(tr.querySelectorAll('td'))
-          .forEach(function(td, j) {
-            td.style.width = thStyles[j].width + 'px';
+          .forEach((td, j) => {
+            td.style.width = `${thStyles[j].width}px`;
             if (j === 0) {
               td.style.position = 'absolute';
               td.style.left = '0';
             }
           });
       });
+      /* eslint-enable */
     },
   },
 };
