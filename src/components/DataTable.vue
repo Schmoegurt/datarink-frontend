@@ -1,6 +1,6 @@
 <template>
   <div class="fixed-table-container">
-    <table v-if="rows && rows.length > 0">
+    <table>
       <thead>
         <tr>
           <th v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }">{{ c.display }}</th>
@@ -176,10 +176,11 @@ module.exports = {
   .fixed-table-container td {
     border-right: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
-    padding: 4px 8px;
+    padding: 6px;
     text-align: right;
     vertical-align: top;
     font-size: 14px;
+    line-height: 18px;
 
     /**
       * Current implementation doesn't work when
@@ -190,15 +191,9 @@ module.exports = {
   .fixed-table-container th {
     background: #eee;
     font-size: 12px;
-    line-height: 16px;
-    padding-top: 10px;
-    padding-bottom: 10px;
   }
   .fixed-table-container td:first-child {
     background: #eee;
-  }
-  .fixed-table-container tr:last-child td {
-    border-bottom: 0;
   }
   .fixed-table-container th:last-child,
   .fixed-table-container td:last-child {
