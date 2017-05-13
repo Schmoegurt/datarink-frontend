@@ -9,6 +9,7 @@
 </template>
 
 <style lang="scss">
+  @import '~normalize.css/normalize.css';
   @import "variables";
 
   body {

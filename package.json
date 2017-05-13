@@ -15,6 +15,7 @@
   "author": "kevkan",
   "license": "ISC",
   "dependencies": {
+    "normalize.css": "^7.0.0",
     "vue": "^2.2.1",
     "vue-router": "^2.3.0"
   },
