@@ -21,6 +21,7 @@ module.exports = {
       columns: [
         { id: 'name', display: 'Name', leftAligned: true },
         { id: 'position', display: 'Pos', leftAligned: true },
+        { id: 'teamString', display: 'Teams' },
         { id: 'gp', display: 'GP' },
         { id: 'mins', display: 'Mins' },
         { id: 'ig', display: 'G' },
@@ -81,6 +82,9 @@ module.exports = {
           .map((r) => {
             /* eslint-disable no-param-reassign */
             r.name = `${r.first_name} ${r.last_name}`.replace(/\./g, '');
+            r.teamString = r.teams.toString()
+              .toUpperCase()
+              .replace(/\,/g, ', ');
             r.mins = Math.round(r.toi / 60);
             r.ip = r.ig + r.ia1 + r.ia2;
             r.iShPct = r.isog === 0 ? 0 : Math.round(1000 * (r.ig / r.isog)) / 10;

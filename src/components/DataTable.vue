@@ -167,7 +167,6 @@ module.exports = {
     overflow: auto;
     position: relative;
   }
-
   .fixed-table-container table {
     border-collapse: collapse;
     width: 100%;
@@ -202,5 +201,8 @@ module.exports = {
   .fixed-table-container th.left-aligned,
   .fixed-table-container td.left-aligned {
     text-align: left;
+  }
+  .fixed-table-container tbody tr:hover td:not(:first-child) {
+    background: #f4f4f4;
   }
 </style>
