@@ -16,6 +16,8 @@
 </template>
 
 <script>
+const _ = require('lodash');
+
 module.exports = {
   name: 'DataTable',
   props: {
@@ -29,41 +31,27 @@ module.exports = {
       tbody: null,
     };
   },
-  updated() {
+  mounted() {
     const self = this;
     const container = this.$el;
     this.thead = container.querySelector('thead');
     this.tbody = container.querySelector('tbody');
-    this.relayout();
 
     // On resize, update table cell dimensions
-    let resizeTimeout;
-    function resizeThrottler() {
-      if (!resizeTimeout) {
-        resizeTimeout = setTimeout(() => {
-          resizeTimeout = null;
-          self.relayout();
-        }, 500);
-      }
-    }
-    window.addEventListener('resize', resizeThrottler, false);
+    window.addEventListener('resize', _.debounce(self.relayout, 250));
 
-    // On scroll, fix thead and first column
-    let scrollTimeout;
-    function scrollThrottler() {
-      if (!scrollTimeout) {
-        scrollTimeout = setTimeout(() => {
-          scrollTimeout = null;
-          self.thead.style.transform = `translate3d(0,${container.scrollTop}px,0)`;
-          const hTransform = `translate3d(${container.scrollLeft}px,0,0)`;
-          self.thead.querySelector('th').style.transform = hTransform;
-          [].slice.call(self.tbody.querySelectorAll('tr > td:first-child'))
-            // eslint-disable-next-line no-param-reassign
-            .forEach(td => (td.style.transform = hTransform));
-        }, 300);
-      }
-    }
-    container.addEventListener('scroll', scrollThrottler, false);
+    // On scroll, reposition table header and first column
+    container.addEventListener('scroll', _.debounce(() => {
+      self.thead.style.transform = `translate3d(0,${container.scrollTop}px,0)`;
+      const hTransform = `translate3d(${container.scrollLeft}px,0,0)`;
+      self.thead.querySelector('th').style.transform = hTransform;
+      [].slice.call(self.tbody.querySelectorAll('tr > td:first-child'))
+        // eslint-disable-next-line no-param-reassign
+        .forEach(td => (td.style.transform = hTransform));
+    }, 50));
+  },
+  updated() {
+    this.relayout();
   },
   methods: {
     // Add inline styles to fix the header row and leftmost column
