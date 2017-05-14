@@ -1,12 +1,13 @@
 <template>
   <div style="height: calc(100% - 32px); position: relative;">
     <h3>Skaters</h3>
-    <input type="text" style="margin-bottom: 16px;" v-model="search"></input>
+    <input type="text" style="margin-bottom: 16px;" v-model="nameInput"></input>
     <DataTable style="height: calc(100% - 48px);" :rows="filteredRows" :columns="columns"></DataTable>
   </div>
 </template>
 
 <script>
+const _ = require('lodash');
 const DataTable = require('./components/DataTable.vue');
 
 module.exports = {
@@ -16,7 +17,8 @@ module.exports = {
   },
   data() {
     return {
-      search: '',
+      nameInput: '',
+      nameQuery: '',
       rows: [],
       columns: [
         { id: 'name', display: 'Name', leftAligned: true },
@@ -61,14 +63,16 @@ module.exports = {
   created() {
     this.fetchData();
   },
+  watch: {
+    nameInput: _.debounce(function setNameQuery() { this.nameQuery = this.nameInput; }, 250),
+  },
   computed: {
     filteredRows() {
       const self = this;
-      if (!self.search) {
+      if (!self.nameQuery) {
         return this.rows;
-      } else {
-        return this.rows.filter(r => r.name.toLowerCase().indexOf(self.search) >= 0);
       }
+      return this.rows.filter(r => r.name.toLowerCase().indexOf(self.nameQuery) >= 0);
     },
   },
   methods: {
@@ -84,7 +88,7 @@ module.exports = {
             r.name = `${r.first_name} ${r.last_name}`.replace(/\./g, '');
             r.teamString = r.teams.toString()
               .toUpperCase()
-              .replace(/\,/g, ', ');
+              .replace(/,/g, ', ');
             r.mins = Math.round(r.toi / 60);
             r.ip = r.ig + r.ia1 + r.ia2;
             r.iShPct = r.isog === 0 ? 0 : Math.round(1000 * (r.ig / r.isog)) / 10;
