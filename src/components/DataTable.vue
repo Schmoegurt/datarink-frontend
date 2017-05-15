@@ -75,7 +75,7 @@ module.exports = {
       thead.style.left = '';
       thead.style.zIndex = '';
       ths.forEach((th) => {
-        th.style.display = '';
+        th.style.float = '';
         th.style.width = '';
         th.style.position = '';
         th.style.top = '';
@@ -92,14 +92,20 @@ module.exports = {
       /**
        * Store width and height of each th
        * getBoundingClientRect()'s dimensions include paddings and borders
+       *
+       * For FF and Safari, sometimes setting a th's width to 20px results
+       * in an actual width of 20.99px - a possible reason for this might
+       * be that the body tds require a larger width than 20px. To fix this,
+       * artificially increase the hardcoded width by widthBuffer
        */
+      const widthBuffer = 5;
       const thStyles = ths.map((th) => {
         const rect = th.getBoundingClientRect();
         const style = document.defaultView.getComputedStyle(th, '');
         return {
-          boundingWidth: rect.width,
-          boundingHeight: rect.height,
-          width: parseInt(style.width, 10),
+          boundingWidth: Math.ceil(rect.width) + widthBuffer,
+          boundingHeight: Math.ceil(rect.height),
+          width: Math.ceil(parseInt(style.width, 10)) + widthBuffer,
           paddingLeft: parseInt(style.paddingLeft, 10),
         };
       });
@@ -119,6 +125,7 @@ module.exports = {
       // Set widths of the th elements in thead. For the fixed th, set its position
       ths.forEach((th, i) => {
         th.style.width = `${thStyles[i].width}px`;
+        th.style.float = 'left';
         if (i === 0) {
           th.style.position = 'absolute';
           th.style.top = '0';
@@ -157,6 +164,7 @@ module.exports = {
   }
   .fixed-table-container table {
     border-collapse: collapse;
+    border-spacing: 0;
     width: 100%;
   }
   .fixed-table-container th,
@@ -181,10 +189,6 @@ module.exports = {
   }
   .fixed-table-container td:first-child {
     background: #eee;
-  }
-  .fixed-table-container th:last-child,
-  .fixed-table-container td:last-child {
-    border-right: 0;
   }
   .fixed-table-container th.left-aligned,
   .fixed-table-container td.left-aligned {
