@@ -6,10 +6,12 @@
           <th v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }">{{ c.display }}</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody v-renderRows="{ rows, columns }">
+        <!--
         <tr v-for="r in rows">
           <td v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }">{{ r[c.id] }}</td>
         </tr>
+        -->
       </tbody>
     </table>
   </div>
@@ -52,6 +54,24 @@ module.exports = {
   },
   updated() {
     this.relayout();
+  },
+  directives: {
+    renderRows(el, binding) {
+      // eslint-disable-next-line no-param-reassign
+      el.innerHTML = binding.value.rows.reduce((result, r) => {
+        let rowHtml = '<tr>';
+        binding.value.columns.forEach((c) => {
+          rowHtml += '<td';
+          if (c.leftAligned) {
+            rowHtml += ' class="left-aligned"';
+          }
+          rowHtml += '>';
+          rowHtml += `${r[c.id]}</td>`;
+        });
+        rowHtml += '</tr>';
+        return result + rowHtml;
+      }, '');
+    },
   },
   methods: {
     // Add inline styles to fix the header row and leftmost column
