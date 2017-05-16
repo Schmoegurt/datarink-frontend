@@ -1,8 +1,8 @@
 <template>
-  <div style="height: calc(100% - 32px); position: relative;">
+  <div style="height: 100%; position: relative;">
     <h3>Skaters</h3>
     <input type="text" style="margin-bottom: 16px;" v-model="nameInput"></input>
-    <DataTable style="height: calc(100% - 80px);" :rows="filteredRows" :columns="columns"></DataTable>
+    <DataTable :rows="filteredRows" :columns="columns"></DataTable>
   </div>
 </template>
 

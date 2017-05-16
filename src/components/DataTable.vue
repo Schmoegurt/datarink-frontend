@@ -1,19 +1,23 @@
 <template>
-  <div class="fixed-table-container">
-    <table>
-      <thead>
-        <tr>
-          <th v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }">{{ c.display }}</th>
-        </tr>
-      </thead>
-      <tbody v-renderRows="{ rows, columns }">
-        <!--
-        <tr v-for="r in rows">
-          <td v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }">{{ r[c.id] }}</td>
-        </tr>
-        -->
-      </tbody>
-    </table>
+  <div style="height: 70%; position: relative;">
+    <div class="fixed-table-container" style="height: calc(100% - 40px);">
+      <table>
+        <thead>
+          <tr>
+            <th v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }">{{ c.display }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="r in pageRows">
+            <td v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }">{{ r[c.id] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <button @click="pageNum = pageNum <= 1 ? 1 : pageNum - 1">Prev</button
+      ><button @click="pageNum += 1">Next</button>
+    </div>
   </div>
 </template>
 
@@ -31,7 +35,16 @@ module.exports = {
       // Store references to table elements
       thead: null,
       tbody: null,
+      pageNum: 1,
+      pageSize: 100,
     };
+  },
+  computed: {
+    pageRows() {
+      const self = this;
+      return this.rows.filter((r, i) =>
+        (i >= (self.pageNum - 1) * self.pageSize && i < self.pageNum * self.pageSize));
+    },
   },
   mounted() {
     const self = this;
@@ -54,24 +67,6 @@ module.exports = {
   },
   updated() {
     this.relayout();
-  },
-  directives: {
-    renderRows(el, binding) {
-      // eslint-disable-next-line no-param-reassign
-      el.innerHTML = binding.value.rows.reduce((result, r) => {
-        let rowHtml = '<tr>';
-        binding.value.columns.forEach((c) => {
-          rowHtml += '<td';
-          if (c.leftAligned) {
-            rowHtml += ' class="left-aligned"';
-          }
-          rowHtml += '>';
-          rowHtml += `${r[c.id]}</td>`;
-        });
-        rowHtml += '</tr>';
-        return result + rowHtml;
-      }, '');
-    },
   },
   methods: {
     // Add inline styles to fix the header row and leftmost column
