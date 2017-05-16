@@ -1,7 +1,36 @@
 <template>
   <div style="height: 100%; position: relative;">
     <h3>Skaters</h3>
-    <input type="text" style="margin-bottom: 16px;" v-model="nameInput"></input>
+    <div>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" v-model="nameInput" style="width: 94px;">
+      </div
+      ><div class="form-group">
+        <label>Team</label>
+        <input type="text" style="width: 70px;">
+      </div
+      ><div class="form-group">
+        <label>Pos</label>
+        <input type="text" style="width: 46px;">
+      </div
+      ><div class="form-group">
+        <label>GP</label>
+        <input type="text" style="width: 46px;">
+      </div
+      ><div class="form-group">
+        <label>Mins</label>
+        <input type="text" style="width: 70px;">
+      </div
+      ><div class="form-group">
+        <label>Columns</label>
+        <input type="text" style="width: 126px;" value="All">
+      </div
+      ><div class="form-group">
+        <label>Values</label>
+        <input type="text" style="width: 126px;" value="Rates|Counts">
+      </div>
+    </div>
     <DataTable :rows="filteredRows" :columns="columns"></DataTable>
   </div>
 </template>
@@ -30,7 +59,7 @@ module.exports = {
         { id: 'ia1', display: 'A1' },
         { id: 'ia2', display: 'A2' },
         { id: 'ip', display: 'Pts' },
-        { id: 'ic', display: 'Corsi' },
+        { id: 'ic', display: 'Own C' },
         { id: 'iShPct', display: 'Own Sh%' },
         { id: 'i_eff_pen_drawn', display: 'Pen drawn' },
         { id: 'i_eff_pen_taken', display: 'Pen taken' },
@@ -41,12 +70,15 @@ module.exports = {
         { id: 'i_blocked', display: 'Blocked' },
         { id: 'gf', display: 'GF' },
         { id: 'ga', display: 'GA' },
+        { id: 'gDiff', display: 'G diff' },
         { id: 'gfPct', display: 'GF%' },
         { id: 'cf', display: 'CF' },
         { id: 'ca', display: 'CA' },
+        { id: 'cDiff', display: 'C diff' },
         { id: 'cfPct', display: 'CF%' },
         { id: 'adj_cf', display: 'CF adj' },
         { id: 'adj_ca', display: 'CA adj' },
+        { id: 'cDiffAdj', display: 'C diff adj' },
         { id: 'cfPctAdj', display: 'CF% adj' },
         { id: 'shPct', display: 'Sh%' },
         { id: 'svPct', display: 'Sv%' },
@@ -96,7 +128,10 @@ module.exports = {
             r.iFoWinPct = r.i_fo_won + r.i_fo_lost === 0 ? 0
               : Math.round(1000 * (r.i_fo_won / (r.i_fo_won + r.i_fo_lost))) / 10;
             r.gfPct = r.gf + r.ga === 0 ? 0 : Math.round(1000 * (r.gf / (r.gf + r.ga))) / 10;
+            r.gDiff = r.gf - r.ga;
+            r.cDiff = r.cf - r.ca;
             r.cfPct = r.cf + r.ca === 0 ? 0 : Math.round(1000 * (r.cf / (r.cf + r.ca))) / 10;
+            r.cDiffAdj = Math.round(r.adj_cf - r.adj_ca);
             r.cfPctAdj = r.adj_cf + r.adj_ca === 0 ? 0
               : Math.round(1000 * (r.adj_cf / (r.adj_cf + r.adj_ca))) / 10;
             r.shPct = r.sf === 0 ? 0 : Math.round(1000 * (r.gf / r.sf)) / 10;

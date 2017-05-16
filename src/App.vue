@@ -71,4 +71,42 @@
   a:hover {
     text-decoration: underline;
   }
+
+.form-group {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 16px 16px 0;
+}
+
+label {
+  font-size: $fs-0;
+  line-height: $lh-copy;
+  padding-bottom: 3px;
+  display: block;
+}
+
+button,
+input[type="text"] {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+
+  display: inline-block;
+  vertical-align: top;
+
+  box-sizing: border-box;
+  height: 32px;
+  line-height: $lh-copy;
+  border: 1px solid #c0c0c0;
+  padding: 0 7px;
+
+  font-size: $fs-0;
+  color: #343434;
+  background: #fff;
+  border-radius: 2px;
+}
+
+.form-group input {
+  display: block;
+}
 </style>

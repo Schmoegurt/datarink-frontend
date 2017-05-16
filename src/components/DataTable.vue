@@ -14,9 +14,10 @@
         </tbody>
       </table>
     </div>
-    <div>
+    <div class="fixed-table-pagination">
       <button @click="pageNum = pageNum <= 1 ? 1 : pageNum - 1">Prev</button
-      ><button @click="pageNum += 1">Next</button>
+      ><span>{{ 1 + ((pageNum - 1) * pageSize) }}-{{ Math.min(pageNum * pageSize, rows.length) }}</span
+      ><button @click="pageNum = pageNum === pageCount ? pageCount : pageNum + 1">Next</button>
     </div>
   </div>
 </template>
@@ -35,6 +36,8 @@ module.exports = {
       // Store references to table elements
       thead: null,
       tbody: null,
+
+      // Pagination variables
       pageNum: 1,
       pageSize: 100,
     };
@@ -44,6 +47,9 @@ module.exports = {
       const self = this;
       return this.rows.filter((r, i) =>
         (i >= (self.pageNum - 1) * self.pageSize && i < self.pageNum * self.pageSize));
+    },
+    pageCount() {
+      return Math.ceil(this.rows.length / this.pageSize);
     },
   },
   mounted() {
@@ -170,10 +176,12 @@ module.exports = {
 };
 </script>
 
-<style>
+<style lang="scss">
+  @import '~normalize.css/normalize.css';
+
   .fixed-table-container {
     box-sizing: border-box;
-    border: 1px solid #ccc;
+    border: 1px solid #c0c0c0;
     overflow: auto;
     position: relative;
   }
@@ -184,8 +192,8 @@ module.exports = {
   }
   .fixed-table-container th,
   .fixed-table-container td {
-    border-right: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
+    border-right: 1px solid #d8d8d8;
+    border-bottom: 1px solid #d8d8d8;
     padding: 6px;
     text-align: right;
     vertical-align: top;
@@ -193,23 +201,40 @@ module.exports = {
     line-height: 18px;
 
     /**
-      * Current implementation doesn't work when
-      * cells in a row have different heights
-      */
+     * Current implementation doesn't work when
+     * cells in a row have different heights
+     */
     white-space: nowrap !important;
   }
   .fixed-table-container th {
-    background: #eee;
+    background: #f3f3f3;
     font-size: 12px;
   }
   .fixed-table-container td:first-child {
-    background: #eee;
+    background: #f3f3f3;
   }
   .fixed-table-container th.left-aligned,
   .fixed-table-container td.left-aligned {
     text-align: left;
   }
-  .fixed-table-container tbody tr:hover td:not(:first-child) {
-    background: #f4f4f4;
+  .fixed-table-container tbody tr:hover td {
+    background: #eaeaea;
+  }
+
+  /**
+   * Pagination
+   */
+  .fixed-table-pagination {
+    padding-top: 8px;
+    font-size: 14px;
+  }
+  .fixed-table-pagination span {
+    display: inline-block;
+    vertical-align: top;
+    line-height: 32px;
+    padding: 0 4px;
+    min-width: 80px;
+    box-sizing: border-box;
+    text-align: center;
   }
 </style>
