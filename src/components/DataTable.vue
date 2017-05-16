@@ -48,7 +48,7 @@ module.exports = {
   },
   mounted() {
     const self = this;
-    const container = this.$el;
+    const container = this.$el.querySelector('.fixed-table-container');
     this.thead = container.querySelector('thead');
     this.tbody = container.querySelector('tbody');
 
