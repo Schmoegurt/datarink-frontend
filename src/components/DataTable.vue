@@ -14,10 +14,16 @@
         </tbody>
       </table>
     </div>
-    <div class="fixed-table-pagination">
-      <button @click="pageNum = pageNum <= 1 ? 1 : pageNum - 1">Prev</button
-      ><span>{{ 1 + ((pageNum - 1) * pageSize) }}-{{ Math.min(pageNum * pageSize, rows.length) }}</span
-      ><button @click="pageNum = pageNum === pageCount ? pageCount : pageNum + 1">Next</button>
+    <div class="fixed-table-pagination" v-if="pageCount > 0">
+      <div class="button-set">
+        <button @click="pageNum = pageNum <= 1 ? 1 : pageNum - 1">
+          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 16 16"><path d="M10,3,5,8l5,5L11,12,7,8,11,4Z"></path></svg>
+        </button
+        ><button @click="pageNum = pageNum === pageCount ? pageCount : pageNum + 1">
+          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 16 16"><path d="M10,3,5,8l5,5L11,12,7,8,11,4Z" transform="rotate(180 8 8)"></path></svg>
+        </button>
+      </div
+      ><span>{{ 1 + ((pageNum - 1) * pageSize) }}-{{ Math.min(pageNum * pageSize, rows.length) }}</span>
     </div>
   </div>
 </template>
@@ -39,7 +45,7 @@ module.exports = {
 
       // Pagination variables
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 50,
     };
   },
   computed: {
@@ -119,7 +125,7 @@ module.exports = {
        * be that the body tds require a larger width than 20px. To fix this,
        * artificially increase the hardcoded width by widthBuffer
        */
-      const widthBuffer = 5;
+      const widthBuffer = 4;
       const thStyles = ths.map((th) => {
         const rect = th.getBoundingClientRect();
         const style = document.defaultView.getComputedStyle(th, '');
@@ -177,64 +183,64 @@ module.exports = {
 </script>
 
 <style lang="scss">
-  @import '~normalize.css/normalize.css';
+  @import "../variables";
 
   .fixed-table-container {
     box-sizing: border-box;
-    border: 1px solid #c0c0c0;
+    border: 1px solid $gray-20;
     overflow: auto;
     position: relative;
+    border-radius: 2px;
   }
   .fixed-table-container table {
     border-collapse: collapse;
-    border-spacing: 0;
     width: 100%;
   }
   .fixed-table-container th,
   .fixed-table-container td {
-    border-right: 1px solid #d8d8d8;
-    border-bottom: 1px solid #d8d8d8;
-    padding: 6px;
+    border-right: 1px solid $gray-10;
+    border-bottom: 1px solid $gray-10;
+    padding: ($ws-xs / 2) $ws-sm (($ws-xs / 2) - 1) $ws-sm;
+    line-height: $lh-1;
+
     text-align: right;
     vertical-align: top;
-    font-size: 14px;
-    line-height: 18px;
-
-    /**
-     * Current implementation doesn't work when
-     * cells in a row have different heights
-     */
+    font-size: $fs-0;
+    font-weight: 400;
     white-space: nowrap !important;
-  }
-  .fixed-table-container th {
-    background: #f3f3f3;
-    font-size: 12px;
-  }
-  .fixed-table-container td:first-child {
-    background: #f3f3f3;
   }
   .fixed-table-container th.left-aligned,
   .fixed-table-container td.left-aligned {
     text-align: left;
   }
+  .fixed-table-container th,
+  .fixed-table-container td:first-child {
+    background: $white-4;
+  }
   .fixed-table-container tbody tr:hover td {
-    background: #eaeaea;
+    background: $gray-1;
   }
 
   /**
    * Pagination
    */
   .fixed-table-pagination {
-    padding-top: 8px;
-    font-size: 14px;
+    padding-top: $ws-sm;
+    font-size: $fs-0;
   }
   .fixed-table-pagination span {
     display: inline-block;
     vertical-align: top;
-    line-height: 32px;
-    padding: 0 4px;
-    min-width: 80px;
+    line-height: $sz-md;
+    margin-left: $ws-md;
     box-sizing: border-box;
-    text-align: center;
+  }
+  .fixed-table-pagination button {
+    line-height: 0;
+  }
+  .fixed-table-pagination button svg {
+    width: $sz-sm;
+    height: $sz-sm;
+    fill: $gray-80;
   }
 </style>

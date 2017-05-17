@@ -7,28 +7,44 @@
         <input type="text" v-model="nameInput" style="width: 94px;">
       </div
       ><div class="form-group">
-        <label>Team</label>
-        <input type="text" style="width: 70px;">
+        <label>Pos</label>
+        <div class="select-container">
+          <select>
+            <option>Any</option>
+            <option>F</option>
+            <option>D</option>
+            <option>C</option>
+            <option>L</option>
+            <option>R</option>
+          </select>
+        </div>
       </div
       ><div class="form-group">
-        <label>Pos</label>
-        <input type="text" style="width: 46px;">
+        <label>Team</label>
+        <div class="select-container">
+          <select>
+            <option>Any</option>
+            <option>ANA</option>
+            <option>BOS</option>
+          </select>
+        </div>
       </div
       ><div class="form-group">
         <label>GP</label>
         <input type="text" style="width: 46px;">
       </div
       ><div class="form-group">
-        <label>Mins</label>
+        <label>Minutes</label>
         <input type="text" style="width: 70px;">
       </div
       ><div class="form-group">
-        <label>Columns</label>
-        <input type="text" style="width: 126px;" value="All">
-      </div
-      ><div class="form-group">
-        <label>Values</label>
-        <input type="text" style="width: 126px;" value="Rates|Counts">
+        <div class="checkbox-group">
+          <input id="rates" type="checkbox" :checked="{ 'toggle-button-checked': showRates }">
+          <label for="rates" class="checkbox-container">
+            <span class="checkbox-checkmark"></span>
+          </label
+          ><label for="rates" class="checkbox-text">Per 60 min</label>
+        </div>
       </div>
     </div>
     <DataTable :rows="filteredRows" :columns="columns"></DataTable>
@@ -48,13 +64,15 @@ module.exports = {
     return {
       nameInput: '',
       nameQuery: '',
+      showRates: false,
       rows: [],
       columns: [
         { id: 'name', display: 'Name', leftAligned: true },
         { id: 'position', display: 'Pos', leftAligned: true },
-        { id: 'teamString', display: 'Teams' },
+        { id: 'teamString', display: 'Team', leftAligned: true },
         { id: 'gp', display: 'GP' },
-        { id: 'mins', display: 'Mins' },
+        { id: 'mins', display: 'Min' },
+        { id: 'minsPerGp', display: 'Min/GP' },
         { id: 'ig', display: 'G' },
         { id: 'ia1', display: 'A1' },
         { id: 'ia2', display: 'A2' },
@@ -115,32 +133,39 @@ module.exports = {
       xhr.open('GET', `${API_URL}${route}`);
       xhr.onload = () => {
         self.rows = JSON.parse(xhr.responseText).skaters
+          .filter((r) => {
+            // Remove players who played less than 1 minute
+            r.mins = Math.round(r.toi / 60);
+            return r.mins > 0;
+          })
           .map((r) => {
             /* eslint-disable no-param-reassign */
             r.name = `${r.first_name} ${r.last_name}`.replace(/\./g, '');
             r.teamString = r.teams.toString()
               .toUpperCase()
               .replace(/,/g, ', ');
-            r.mins = Math.round(r.toi / 60);
+            r.minsPerGp = Math.round((r.toi / 60) / r.gp);
             r.ip = r.ig + r.ia1 + r.ia2;
-            r.iShPct = r.isog === 0 ? 0 : Math.round(1000 * (r.ig / r.isog)) / 10;
+            r.iShPct = r.isog === 0 ? 0 : Math.round(100 * (r.ig / r.isog));
             r.penDiff = r.i_eff_pen_drawn - r.i_eff_pen_taken;
             r.iFoWinPct = r.i_fo_won + r.i_fo_lost === 0 ? 0
-              : Math.round(1000 * (r.i_fo_won / (r.i_fo_won + r.i_fo_lost))) / 10;
-            r.gfPct = r.gf + r.ga === 0 ? 0 : Math.round(1000 * (r.gf / (r.gf + r.ga))) / 10;
+              : Math.round(100 * (r.i_fo_won / (r.i_fo_won + r.i_fo_lost)));
+            r.gfPct = r.gf + r.ga === 0 ? 0 : Math.round(100 * (r.gf / (r.gf + r.ga)));
             r.gDiff = r.gf - r.ga;
             r.cDiff = r.cf - r.ca;
-            r.cfPct = r.cf + r.ca === 0 ? 0 : Math.round(1000 * (r.cf / (r.cf + r.ca))) / 10;
+            r.cfPct = r.cf + r.ca === 0 ? 0 : Math.round(100 * (r.cf / (r.cf + r.ca)));
             r.cDiffAdj = Math.round(r.adj_cf - r.adj_ca);
             r.cfPctAdj = r.adj_cf + r.adj_ca === 0 ? 0
-              : Math.round(1000 * (r.adj_cf / (r.adj_cf + r.adj_ca))) / 10;
-            r.shPct = r.sf === 0 ? 0 : Math.round(1000 * (r.gf / r.sf)) / 10;
-            r.svPct = r.sa === 0 ? 0 : Math.round(1000 * (1 - (r.ga / r.sa))) / 10;
-            r.pdo = Math.round(10 * (r.shPct + r.svPct)) / 10;
-            r.ofoPct = Math.round(1000 * (r.ofo / (r.ofo + r.dfo + r.nfo + r.otf))) / 10;
-            r.dfoPct = Math.round(1000 * (r.dfo / (r.ofo + r.dfo + r.nfo + r.otf))) / 10;
+              : Math.round(100 * (r.adj_cf / (r.adj_cf + r.adj_ca)));
+            r.shPct = r.sf === 0 ? 0 : 100 * (r.gf / r.sf);
+            r.svPct = r.sa === 0 ? 0 : 100 * (1 - (r.ga / r.sa));
+            r.pdo = Math.round(r.shPct + r.svPct);
+            r.ofoPct = Math.round(100 * (r.ofo / (r.ofo + r.dfo + r.nfo + r.otf)));
+            r.dfoPct = Math.round(100 * (r.dfo / (r.ofo + r.dfo + r.nfo + r.otf)));
 
-            // Round adjusted corsi after calculating adjusted cfPct
+            // Round values that were previously used to calculate other stats
+            r.shPct = Math.round(r.shPct);
+            r.svPct = Math.round(r.svPct);
             r.adj_cf = Math.round(r.adj_cf);
             r.adj_ca = Math.round(r.adj_ca);
             /* eslint-enable */
