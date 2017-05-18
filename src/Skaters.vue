@@ -185,8 +185,8 @@ module.exports = {
           .filter((r) => {
             // Remove players who played less than 1 minute
             // eslint-disable-next-line no-param-reassign
-            r.mins = Math.round(r.toi / 60);
-            return r.mins > 0;
+            r.mins = r.toi / 60;
+            return Math.round(r.mins) > 0;
           })
           .map((r) => {
             /* eslint-disable no-param-reassign */
@@ -197,30 +197,24 @@ module.exports = {
             r.teamString = r.teams.toString()
               .toUpperCase()
               .replace(/,/g, ', ');
-            r.minsPerGp = Math.round((r.toi / 60) / r.gp);
+            r.minsPerGp = (r.toi / 60) / r.gp;
             r.ip = r.ig + r.ia1 + r.ia2;
-            r.iShPct = r.isog === 0 ? 0 : Math.round(100 * (r.ig / r.isog));
+            r.iShPct = r.isog === 0 ? 0 : 100 * (r.ig / r.isog);
             r.penDiff = r.i_eff_pen_drawn - r.i_eff_pen_taken;
             r.iFoWinPct = r.i_fo_won + r.i_fo_lost === 0 ? 0
-              : Math.round(100 * (r.i_fo_won / (r.i_fo_won + r.i_fo_lost)));
-            r.gfPct = r.gf + r.ga === 0 ? 0 : Math.round(100 * (r.gf / (r.gf + r.ga)));
+              : 100 * (r.i_fo_won / (r.i_fo_won + r.i_fo_lost));
+            r.gfPct = r.gf + r.ga === 0 ? 0 : 100 * (r.gf / (r.gf + r.ga));
             r.gDiff = r.gf - r.ga;
             r.cDiff = r.cf - r.ca;
-            r.cfPct = r.cf + r.ca === 0 ? 0 : Math.round(100 * (r.cf / (r.cf + r.ca)));
-            r.cDiffAdj = Math.round(r.adj_cf - r.adj_ca);
+            r.cfPct = r.cf + r.ca === 0 ? 0 : 100 * (r.cf / (r.cf + r.ca));
+            r.cDiffAdj = r.adj_cf - r.adj_ca;
             r.cfPctAdj = r.adj_cf + r.adj_ca === 0 ? 0
-              : Math.round(100 * (r.adj_cf / (r.adj_cf + r.adj_ca)));
+              : 100 * (r.adj_cf / (r.adj_cf + r.adj_ca));
             r.shPct = r.sf === 0 ? 0 : 100 * (r.gf / r.sf);
             r.svPct = r.sa === 0 ? 0 : 100 * (1 - (r.ga / r.sa));
-            r.pdo = Math.round(r.shPct + r.svPct);
-            r.ofoPct = Math.round(100 * (r.ofo / (r.ofo + r.dfo + r.nfo + r.otf)));
-            r.dfoPct = Math.round(100 * (r.dfo / (r.ofo + r.dfo + r.nfo + r.otf)));
-
-            // Round values that were previously used to calculate other stats
-            r.shPct = Math.round(r.shPct);
-            r.svPct = Math.round(r.svPct);
-            r.adj_cf = Math.round(r.adj_cf);
-            r.adj_ca = Math.round(r.adj_ca);
+            r.pdo = r.shPct + r.svPct;
+            r.ofoPct = 100 * (r.ofo / (r.ofo + r.dfo + r.nfo + r.otf));
+            r.dfoPct = 100 * (r.dfo / (r.ofo + r.dfo + r.nfo + r.otf));
             /* eslint-enable */
             return r;
           });
