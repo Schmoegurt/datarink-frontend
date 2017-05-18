@@ -89,22 +89,22 @@ module.exports = {
         { id: 'iShPct', display: 'Own Sh%' },
         { id: 'i_eff_pen_drawn', display: 'Pen drawn', hasRate: true },
         { id: 'i_eff_pen_taken', display: 'Pen taken', hasRate: true },
-        { id: 'penDiff', display: 'Pen diff', hasRate: true },
+        { id: 'penDiff', display: 'Pen diff', hasRate: true, isDiff: true },
         { id: 'iFoWinPct', display: 'FO win%' },
         { id: 'i_fo_won', display: 'FO won', hasRate: true },
         { id: 'i_fo_lost', display: 'FO lost', hasRate: true },
         { id: 'i_blocked', display: 'Blocked', hasRate: true },
         { id: 'gf', display: 'GF', hasRate: true },
         { id: 'ga', display: 'GA', hasRate: true },
-        { id: 'gDiff', display: 'G diff', hasRate: true },
+        { id: 'gDiff', display: 'G diff', hasRate: true, isDiff: true },
         { id: 'gfPct', display: 'GF%' },
         { id: 'cf', display: 'CF', hasRate: true },
         { id: 'ca', display: 'CA', hasRate: true },
-        { id: 'cDiff', display: 'C diff', hasRate: true },
+        { id: 'cDiff', display: 'C diff', hasRate: true, isDiff: true },
         { id: 'cfPct', display: 'CF%' },
         { id: 'adj_cf', display: 'CF adj', hasRate: true },
         { id: 'adj_ca', display: 'CA adj', hasRate: true },
-        { id: 'cDiffAdj', display: 'C diff adj', hasRate: true },
+        { id: 'cDiffAdj', display: 'C diff adj', hasRate: true, isDiff: true },
         { id: 'cfPctAdj', display: 'CF% adj' },
         { id: 'shPct', display: 'Sh%' },
         { id: 'svPct', display: 'Sv%' },
@@ -223,7 +223,7 @@ module.exports = {
         this.columns.forEach((c) => {
           if (typeof this.rows[0][c.id] === 'number') {
             // eslint-disable-next-line no-param-reassign
-            c.decimalPlaces = 0;
+            c.decimals = 0;
           }
         });
       };
@@ -239,7 +239,7 @@ module.exports = {
             r[c.id] = this.showRates ?
               (60 * 60) * (r[c.id] / r.toi) :
               (r[c.id] * r.toi) / (60 * 60);
-            c.decimalPlaces = this.showRates ? 1 : 0;
+            c.decimals = this.showRates ? 1 : 0;
             /* eslint-enable */
           });
         return r;

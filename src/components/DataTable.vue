@@ -10,9 +10,7 @@
         <tbody>
           <tr v-for="r in pageRows">
             <td v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }">{{
-              c.hasOwnProperty('decimalPlaces') ?
-              r[c.id].toFixed(c.decimalPlaces) :
-              r[c.id]
+              r[c.id] | format(c.decimals, c.isDiff)
             }}</td>
           </tr>
         </tbody>
@@ -83,6 +81,19 @@ module.exports = {
   },
   updated() {
     this.relayout();
+  },
+  filters: {
+    format(value, decimals, isDiff) {
+      let outString = value;
+      let rounded;
+      if (typeof decimals === 'number') {
+        // Rounding decimals: http://www.jacklmoore.com/notes/rounding-in-javascript/
+        rounded = Math.round(`${value}e${decimals}`);
+        rounded = Number(`${rounded}e-${decimals}`);
+        outString = rounded.toFixed(decimals);
+      }
+      return isDiff && rounded > 0 ? `+${outString}` : outString;
+    },
   },
   methods: {
     // Add inline styles to fix the header row and leftmost column
