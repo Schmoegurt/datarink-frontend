@@ -84,6 +84,7 @@
 
   button,
   input[type="text"],
+  input[type="number"],
   select {
     -moz-appearance: none;
     -webkit-appearance: none;
@@ -101,6 +102,16 @@
     color: $gray-80;
     background: #fff;
     border-radius: 2px;
+  }
+
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type=number] {
+    -moz-appearance:textfield;
   }
 
   button.selected,
@@ -129,6 +140,7 @@
   }
 
   input[type="text"]:focus,
+  input[type="number"]:focus,
   select:focus,
   button:focus {
     outline: 0;

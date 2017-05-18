@@ -75,7 +75,7 @@ module.exports = {
       [].slice.call(self.tbody.querySelectorAll('tr > td:first-child'))
         // eslint-disable-next-line no-param-reassign
         .forEach(td => (td.style.transform = hTransform));
-    }, 50));
+    }, 250));
   },
   updated() {
     this.relayout();

@@ -4,42 +4,42 @@
     <div>
       <div class="form-group">
         <label>Name</label>
-        <input type="text" v-model="nameInput" style="width: 94px;">
+        <input type="text" v-model="nameDebounced" style="width: 94px;">
       </div
       ><div class="form-group">
         <label>Pos</label>
         <div class="select-container">
-          <select>
-            <option>Any</option>
-            <option>F</option>
-            <option>D</option>
-            <option>C</option>
-            <option>L</option>
-            <option>R</option>
+          <select v-model="posQuery">
+            <option value="">Any</option>
+            <option value="f">F</option>
+            <option value="d">D</option>
+            <option value="c">C</option>
+            <option value="l">L</option>
+            <option value="r">R</option>
           </select>
         </div>
       </div
       ><div class="form-group">
         <label>Team</label>
         <div class="select-container">
-          <select>
-            <option>Any</option>
-            <option>ANA</option>
-            <option>BOS</option>
+          <select v-model="teamQuery">
+            <option value="">Any</option>
+            <option v-for="t in teams" :value="t">{{ t.toUpperCase() }}</option>
           </select>
         </div>
       </div
       ><div class="form-group">
         <label>GP</label>
-        <input type="text" style="width: 46px;">
+        <input type="number" style="width: 46px;" v-model.number="gpDebounced">
       </div
       ><div class="form-group">
         <label>Minutes</label>
-        <input type="text" style="width: 70px;">
+        <input type="number" style="width: 70px;" v-model.number="toiDebounced">
       </div
       ><div class="form-group">
         <div class="checkbox-group">
-          <input id="rates" type="checkbox" :checked="{ 'toggle-button-checked': showRates }">
+          <input id="rates" type="checkbox"
+            v-model="showRates" :checked="{ 'toggle-button-checked': showRates }">
           <label for="rates" class="checkbox-container">
             <span class="checkbox-checkmark"></span>
           </label
@@ -62,13 +62,19 @@ module.exports = {
   },
   data() {
     return {
-      nameInput: '',
+      nameDebounced: '',
       nameQuery: '',
+      toiDebounced: '',
+      toiQuery: '',
+      gpDebounced: '',
+      gpQuery: '',
+      posQuery: '',
+      teamQuery: '',
       showRates: false,
       rows: [],
       columns: [
         { id: 'name', display: 'Name', leftAligned: true },
-        { id: 'position', display: 'Pos', leftAligned: true },
+        { id: 'posString', display: 'Pos', leftAligned: true },
         { id: 'teamString', display: 'Team', leftAligned: true },
         { id: 'gp', display: 'GP' },
         { id: 'mins', display: 'Min' },
@@ -114,15 +120,50 @@ module.exports = {
     this.fetchData();
   },
   watch: {
-    nameInput: _.debounce(function setNameQuery() { this.nameQuery = this.nameInput; }, 250),
+    nameDebounced: _.debounce(function setNameQuery() { this.nameQuery = this.nameDebounced; }, 250),
+    toiDebounced: _.debounce(function setToiQuery() { this.toiQuery = this.toiDebounced; }, 250),
+    gpDebounced: _.debounce(function setGpQuery() { this.gpQuery = this.gpDebounced; }, 250),
   },
   computed: {
+    teams() {
+      const uniqTeams = this.rows.reduce((result, cur) => {
+        cur.teams.forEach((team) => {
+          if (result.indexOf(team) < 0) {
+            result.push(team);
+          }
+        });
+        return result;
+      }, []);
+      return uniqTeams.sort();
+    },
     filteredRows() {
       const self = this;
-      if (!self.nameQuery) {
-        return this.rows;
-      }
-      return this.rows.filter(r => r.name.toLowerCase().indexOf(self.nameQuery) >= 0);
+      return this.rows.filter((r) => {
+        let returned = true;
+        if (self.nameQuery) {
+          returned = r.name.toLowerCase().indexOf(self.nameQuery) >= 0 ? true : false;
+        }
+        if (returned && self.toiQuery) {
+          returned = r.mins >= self.toiQuery ? true : false;
+        }
+        if (returned && self.gpQuery) {
+          returned = r.gp >= self.gpQuery ? true : false;
+        }
+        if (self.teamQuery) {
+          returned = r.teams.indexOf(self.teamQuery) >= 0 ? true : false;
+        }
+        if (returned && self.posQuery) {
+          if (self.posQuery === 'f') {
+            returned = r.positions.indexOf('c') >= 0
+              || r.positions.indexOf('l') >= 0
+              || r.positions.indexOf('r') >= 0
+              ? true : false;
+          } else {
+            returned = r.positions.indexOf(self.posQuery) >= 0 ? true : false;
+          }
+        }
+        return returned;
+      });
     },
   },
   methods: {
@@ -141,6 +182,9 @@ module.exports = {
           .map((r) => {
             /* eslint-disable no-param-reassign */
             r.name = `${r.first_name} ${r.last_name}`.replace(/\./g, '');
+            r.posString = r.positions.toString()
+              .toUpperCase()
+              .replace(/,/g, ', ');
             r.teamString = r.teams.toString()
               .toUpperCase()
               .replace(/,/g, ', ');
