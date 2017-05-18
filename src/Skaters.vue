@@ -70,7 +70,9 @@ module.exports = {
       gpQuery: '',
       posQuery: '',
       teamQuery: '',
+
       showRates: false,
+
       rows: [],
       columns: [
         { id: 'name', display: 'Name', leftAligned: true },
@@ -79,40 +81,40 @@ module.exports = {
         { id: 'gp', display: 'GP' },
         { id: 'mins', display: 'Min' },
         { id: 'minsPerGp', display: 'Min/GP' },
-        { id: 'ig', display: 'G' },
-        { id: 'ia1', display: 'A1' },
-        { id: 'ia2', display: 'A2' },
-        { id: 'ip', display: 'Pts' },
-        { id: 'ic', display: 'Own C' },
+        { id: 'ig', display: 'G', hasRate: true },
+        { id: 'ia1', display: 'A1', hasRate: true },
+        { id: 'ia2', display: 'A2', hasRate: true },
+        { id: 'ip', display: 'Pts', hasRate: true },
+        { id: 'ic', display: 'Own C', hasRate: true },
         { id: 'iShPct', display: 'Own Sh%' },
-        { id: 'i_eff_pen_drawn', display: 'Pen drawn' },
-        { id: 'i_eff_pen_taken', display: 'Pen taken' },
-        { id: 'penDiff', display: 'Pen diff' },
+        { id: 'i_eff_pen_drawn', display: 'Pen drawn', hasRate: true },
+        { id: 'i_eff_pen_taken', display: 'Pen taken', hasRate: true },
+        { id: 'penDiff', display: 'Pen diff', hasRate: true },
         { id: 'iFoWinPct', display: 'FO win%' },
-        { id: 'i_fo_won', display: 'FO won' },
-        { id: 'i_fo_lost', display: 'FO lost' },
-        { id: 'i_blocked', display: 'Blocked' },
-        { id: 'gf', display: 'GF' },
-        { id: 'ga', display: 'GA' },
-        { id: 'gDiff', display: 'G diff' },
+        { id: 'i_fo_won', display: 'FO won', hasRate: true },
+        { id: 'i_fo_lost', display: 'FO lost', hasRate: true },
+        { id: 'i_blocked', display: 'Blocked', hasRate: true },
+        { id: 'gf', display: 'GF', hasRate: true },
+        { id: 'ga', display: 'GA', hasRate: true },
+        { id: 'gDiff', display: 'G diff', hasRate: true },
         { id: 'gfPct', display: 'GF%' },
-        { id: 'cf', display: 'CF' },
-        { id: 'ca', display: 'CA' },
-        { id: 'cDiff', display: 'C diff' },
+        { id: 'cf', display: 'CF', hasRate: true },
+        { id: 'ca', display: 'CA', hasRate: true },
+        { id: 'cDiff', display: 'C diff', hasRate: true },
         { id: 'cfPct', display: 'CF%' },
-        { id: 'adj_cf', display: 'CF adj' },
-        { id: 'adj_ca', display: 'CA adj' },
-        { id: 'cDiffAdj', display: 'C diff adj' },
+        { id: 'adj_cf', display: 'CF adj', hasRate: true },
+        { id: 'adj_ca', display: 'CA adj', hasRate: true },
+        { id: 'cDiffAdj', display: 'C diff adj', hasRate: true },
         { id: 'cfPctAdj', display: 'CF% adj' },
         { id: 'shPct', display: 'Sh%' },
         { id: 'svPct', display: 'Sv%' },
         { id: 'pdo', display: 'PDO' },
         { id: 'ofoPct', display: 'OFO%' },
         { id: 'dfoPct', display: 'DFO%' },
-        { id: 'ofo', display: 'OFO' },
-        { id: 'dfo', display: 'DFO' },
-        { id: 'nfo', display: 'NFO' },
-        { id: 'otf', display: 'OTF' },
+        { id: 'ofo', display: 'OFO', hasRate: true },
+        { id: 'dfo', display: 'DFO', hasRate: true },
+        { id: 'nfo', display: 'NFO', hasRate: true },
+        { id: 'otf', display: 'OTF', hasRate: true },
       ],
     };
   },
@@ -120,9 +122,14 @@ module.exports = {
     this.fetchData();
   },
   watch: {
-    nameDebounced: _.debounce(function setNameQuery() { this.nameQuery = this.nameDebounced; }, 250),
+    nameDebounced: _.debounce(function setNameQuery() {
+      this.nameQuery = this.nameDebounced;
+    }, 250),
     toiDebounced: _.debounce(function setToiQuery() { this.toiQuery = this.toiDebounced; }, 250),
     gpDebounced: _.debounce(function setGpQuery() { this.gpQuery = this.gpDebounced; }, 250),
+    showRates() {
+      this.toggleRates();
+    },
   },
   computed: {
     teams() {
@@ -137,29 +144,31 @@ module.exports = {
       return uniqTeams.sort();
     },
     filteredRows() {
-      const self = this;
       return this.rows.filter((r) => {
         let returned = true;
-        if (self.nameQuery) {
-          returned = r.name.toLowerCase().indexOf(self.nameQuery) >= 0 ? true : false;
+        if (this.nameQuery) {
+          returned = r.name.toLowerCase().indexOf(this.nameQuery) >= 0;
         }
-        if (returned && self.toiQuery) {
-          returned = r.mins >= self.toiQuery ? true : false;
+
+        if (returned && this.toiQuery) {
+          returned = r.mins >= this.toiQuery;
         }
-        if (returned && self.gpQuery) {
-          returned = r.gp >= self.gpQuery ? true : false;
+
+        if (returned && this.gpQuery) {
+          returned = r.gp >= this.gpQuery;
         }
-        if (self.teamQuery) {
-          returned = r.teams.indexOf(self.teamQuery) >= 0 ? true : false;
+
+        if (this.teamQuery) {
+          returned = r.teams.indexOf(this.teamQuery) >= 0;
         }
-        if (returned && self.posQuery) {
-          if (self.posQuery === 'f') {
+
+        if (returned && this.posQuery) {
+          if (this.posQuery === 'f') {
             returned = r.positions.indexOf('c') >= 0
               || r.positions.indexOf('l') >= 0
-              || r.positions.indexOf('r') >= 0
-              ? true : false;
+              || r.positions.indexOf('r') >= 0;
           } else {
-            returned = r.positions.indexOf(self.posQuery) >= 0 ? true : false;
+            returned = r.positions.indexOf(this.posQuery) >= 0;
           }
         }
         return returned;
@@ -168,14 +177,14 @@ module.exports = {
   },
   methods: {
     fetchData() {
-      const self = this;
       const xhr = new XMLHttpRequest();
       const route = '/skaters/?start=20161010&end=20170510&strSits=ev5';
       xhr.open('GET', `${API_URL}${route}`);
       xhr.onload = () => {
-        self.rows = JSON.parse(xhr.responseText).skaters
+        this.rows = JSON.parse(xhr.responseText).skaters
           .filter((r) => {
             // Remove players who played less than 1 minute
+            // eslint-disable-next-line no-param-reassign
             r.mins = Math.round(r.toi / 60);
             return r.mins > 0;
           })
@@ -215,8 +224,32 @@ module.exports = {
             /* eslint-enable */
             return r;
           });
+
+        // By default, rates are not shown, so set decimal places to 0
+        this.columns.forEach((c) => {
+          if (typeof this.rows[0][c.id] === 'number') {
+            // eslint-disable-next-line no-param-reassign
+            c.decimalPlaces = 0;
+          }
+        });
       };
       xhr.send();
+    },
+
+    // Convert stats between counts and rates
+    toggleRates() {
+      this.rows = this.rows.map((r) => {
+        this.columns.filter(c => c.hasRate)
+          .forEach((c) => {
+            /* eslint-disable no-param-reassign */
+            r[c.id] = this.showRates ?
+              (60 * 60) * (r[c.id] / r.toi) :
+              (r[c.id] * r.toi) / (60 * 60);
+            c.decimalPlaces = this.showRates ? 1 : 0;
+            /* eslint-enable */
+          });
+        return r;
+      });
     },
   },
 };

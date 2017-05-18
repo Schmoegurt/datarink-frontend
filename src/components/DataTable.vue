@@ -9,7 +9,11 @@
         </thead>
         <tbody>
           <tr v-for="r in pageRows">
-            <td v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }">{{ r[c.id] }}</td>
+            <td v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }">{{
+              c.hasOwnProperty('decimalPlaces') ?
+              r[c.id].toFixed(c.decimalPlaces) :
+              r[c.id]
+            }}</td>
           </tr>
         </tbody>
       </table>
