@@ -1,8 +1,12 @@
 <template>
   <div style="height: 100%; position: relative;">
     <nav>
-      <router-link to='/skaters'>Skaters</router-link>
-      <router-link to='/teams'>Teams</router-link>
+      <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="143 1 12 14">
+        <path d="M155 1v8a6 6 0 0 1-6 6h-6V1h10v2h-8v10h4a4 4 0 0 0 4-4V1z"/>
+        <path d="M147 5v6h2V7h2V5z"/>
+      </svg
+      ><router-link to='/skaters'>Skaters</router-link
+      ><router-link to='/teams'>Teams</router-link>
     </nav>
     <router-view></router-view>
   </div>
@@ -21,7 +25,7 @@
     font-size: $fs-1;
     line-height: $lh-1;
     color: $gray-80;
-    padding: $ws-lg;
+    padding: $ws-md $ws-lg;
     height: 100%;
     position: relative;
     box-sizing: border-box;
@@ -76,6 +80,37 @@
     font-size: $fs-0;
     line-height: $lh-0;
     padding-bottom: $ws-xs;
+  }
+
+  /**
+   * Nav
+   */
+
+  nav {
+    border-bottom: 1px solid $gray-10;
+    padding-bottom: ($ws-md - 1);
+    margin-bottom: $ws-lg;
+  }
+
+  nav > * {
+    font-size: 0;
+    line-height: 0;
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  nav > a {
+    font-size: $fs-0;
+    line-height: $lh-0;
+    margin: 0 0 0 $ws-md;
+    padding: (($sz-md - $lh-0) / 2) 0;
+  }
+
+  svg.logo {
+    margin: 2px;
+    height: 28px;
+    stroke: none;
+    fill: $blue-40;
   }
 
   /**
