@@ -47,7 +47,7 @@
         </div>
       </div>
     </div>
-    <DataTable :rows="filteredRows" :columns="columns"></DataTable>
+    <DataTable v-on:thClick="setSort" :rows="filteredRows" :columns="columns"></DataTable>
   </div>
 </template>
 
@@ -64,14 +64,17 @@ module.exports = {
     return {
       nameDebounced: '',
       nameQuery: '',
-      toiDebounced: '',
-      toiQuery: '',
+      toiDebounced: 120,
+      toiQuery: 120,
       gpDebounced: '',
       gpQuery: '',
       posQuery: '',
       teamQuery: '',
 
       showRates: false,
+
+      sortOrder: -1,
+      sortCol: 'mins',
 
       rows: [],
       columns: [
@@ -90,9 +93,9 @@ module.exports = {
         { id: 'i_eff_pen_drawn', display: 'Pen drawn', hasRate: true },
         { id: 'i_eff_pen_taken', display: 'Pen taken', hasRate: true },
         { id: 'penDiff', display: 'Pen diff', hasRate: true, isDiff: true },
-        { id: 'iFoWinPct', display: 'FO win%' },
-        { id: 'i_fo_won', display: 'FO won', hasRate: true },
-        { id: 'i_fo_lost', display: 'FO lost', hasRate: true },
+        { id: 'iFoWinPct', display: 'FO W%' },
+        { id: 'i_fo_won', display: 'FO W', hasRate: true },
+        { id: 'i_fo_lost', display: 'FO L', hasRate: true },
         { id: 'i_blocked', display: 'Blocked', hasRate: true },
         { id: 'gf', display: 'GF', hasRate: true },
         { id: 'ga', display: 'GA', hasRate: true },
@@ -188,36 +191,7 @@ module.exports = {
             r.mins = r.toi / 60;
             return Math.round(r.mins) > 0;
           })
-          .map((r) => {
-            /* eslint-disable no-param-reassign */
-            r.name = `${r.first_name} ${r.last_name}`.replace(/\./g, '');
-            r.posString = r.positions.toString()
-              .toUpperCase()
-              .replace(/,/g, ', ');
-            r.teamString = r.teams.toString()
-              .toUpperCase()
-              .replace(/,/g, ', ');
-            r.minsPerGp = (r.toi / 60) / r.gp;
-            r.ip = r.ig + r.ia1 + r.ia2;
-            r.iShPct = r.isog === 0 ? 0 : 100 * (r.ig / r.isog);
-            r.penDiff = r.i_eff_pen_drawn - r.i_eff_pen_taken;
-            r.iFoWinPct = r.i_fo_won + r.i_fo_lost === 0 ? 0
-              : 100 * (r.i_fo_won / (r.i_fo_won + r.i_fo_lost));
-            r.gfPct = r.gf + r.ga === 0 ? 0 : 100 * (r.gf / (r.gf + r.ga));
-            r.gDiff = r.gf - r.ga;
-            r.cDiff = r.cf - r.ca;
-            r.cfPct = r.cf + r.ca === 0 ? 0 : 100 * (r.cf / (r.cf + r.ca));
-            r.cDiffAdj = r.adj_cf - r.adj_ca;
-            r.cfPctAdj = r.adj_cf + r.adj_ca === 0 ? 0
-              : 100 * (r.adj_cf / (r.adj_cf + r.adj_ca));
-            r.shPct = r.sf === 0 ? 0 : 100 * (r.gf / r.sf);
-            r.svPct = r.sa === 0 ? 0 : 100 * (1 - (r.ga / r.sa));
-            r.pdo = r.shPct + r.svPct;
-            r.ofoPct = 100 * (r.ofo / (r.ofo + r.dfo + r.nfo + r.otf));
-            r.dfoPct = 100 * (r.dfo / (r.ofo + r.dfo + r.nfo + r.otf));
-            /* eslint-enable */
-            return r;
-          });
+          .map(r => this.initRow(r));
 
         // By default, rates are not shown, so set decimal places to 0
         this.columns.forEach((c) => {
@@ -226,6 +200,8 @@ module.exports = {
             c.decimals = 0;
           }
         });
+
+        this.sortRows();
       };
       xhr.send();
     },
@@ -244,6 +220,66 @@ module.exports = {
           });
         return r;
       });
+      this.sortRows();
+    },
+
+    // Set sort order
+    setSort(col) {
+      this.sortOrder = col.id === this.sortCol ? -this.sortOrder : -1;
+      this.sortCol = col.id;
+      this.sortRows();
+    },
+
+    // Sort rows by the specified column
+    sortRows() {
+      if (typeof this.rows[0][this.sortCol] === 'string') {
+        this.rows.sort((a, b) => {
+          const aVal = a[this.sortCol].toLowerCase();
+          const bVal = b[this.sortCol].toLowerCase();
+          if (aVal > bVal) {
+            return -1 * this.sortOrder;
+          } else if (aVal < bVal) {
+            return 1 * this.sortOrder;
+          }
+
+          return 0;
+        });
+      } else {
+        // Sort numbers
+        this.rows.sort((a, b) => this.sortOrder * (a[this.sortCol] - b[this.sortCol]));
+      }
+    },
+
+    // Initialize the given row: format strings, calculate stats
+    initRow(r) {
+      /* eslint-disable no-param-reassign */
+      r.name = `${r.first_name} ${r.last_name}`.replace(/\./g, '');
+      r.posString = r.positions.toString()
+        .toUpperCase()
+        .replace(/,/g, ', ');
+      r.teamString = r.teams.toString()
+        .toUpperCase()
+        .replace(/,/g, ', ');
+      r.minsPerGp = (r.toi / 60) / r.gp;
+      r.ip = r.ig + r.ia1 + r.ia2;
+      r.iShPct = r.isog === 0 ? 0 : 100 * (r.ig / r.isog);
+      r.penDiff = r.i_eff_pen_drawn - r.i_eff_pen_taken;
+      r.iFoWinPct = r.i_fo_won + r.i_fo_lost === 0 ? 0
+        : 100 * (r.i_fo_won / (r.i_fo_won + r.i_fo_lost));
+      r.gfPct = r.gf + r.ga === 0 ? 0 : 100 * (r.gf / (r.gf + r.ga));
+      r.gDiff = r.gf - r.ga;
+      r.cDiff = r.cf - r.ca;
+      r.cfPct = r.cf + r.ca === 0 ? 0 : 100 * (r.cf / (r.cf + r.ca));
+      r.cDiffAdj = r.adj_cf - r.adj_ca;
+      r.cfPctAdj = r.adj_cf + r.adj_ca === 0 ? 0
+        : 100 * (r.adj_cf / (r.adj_cf + r.adj_ca));
+      r.shPct = r.sf === 0 ? 0 : 100 * (r.gf / r.sf);
+      r.svPct = r.sa === 0 ? 0 : 100 * (1 - (r.ga / r.sa));
+      r.pdo = r.shPct + r.svPct;
+      r.ofoPct = 100 * (r.ofo / (r.ofo + r.dfo + r.nfo + r.otf));
+      r.dfoPct = 100 * (r.dfo / (r.ofo + r.dfo + r.nfo + r.otf));
+      /* eslint-enable */
+      return r;
     },
   },
 };

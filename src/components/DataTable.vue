@@ -4,7 +4,9 @@
       <table>
         <thead>
           <tr>
-            <th v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }">{{ c.display }}</th>
+            <th v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }"
+              @click="emitThClick(c)"
+            >{{ c.display }}</th>
           </tr>
         </thead>
         <tbody>
@@ -96,6 +98,11 @@ module.exports = {
     },
   },
   methods: {
+    // Emit thClick event to parent and pass the column to sort
+    emitThClick(col) {
+      this.$emit('thClick', col);
+    },
+
     // Add inline styles to fix the header row and leftmost column
     relayout() {
       // Allow parameter reassignment so we can set element styles

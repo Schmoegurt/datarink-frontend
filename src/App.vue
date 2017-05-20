@@ -98,6 +98,7 @@
     border: 1px solid $gray-20;
     padding: 0 $ws-sm;
 
+    font-family: $font-stack;
     font-size: $fs-0;
     color: $gray-80;
     background: #fff;
