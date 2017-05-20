@@ -6,7 +6,9 @@
           <tr>
             <th v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }"
               tabindex="0" @click="emitThClick(c)" @keyup.enter="emitThClick(c)"
-            >{{ c.display }}</th>
+              >{{ c.display }}<span class="sort-marker"
+                v-if="sortMarker.col === c.id">{{ sortMarker.order === 1 ? '↑' : '↓' }}</span>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -40,6 +42,7 @@ module.exports = {
   props: {
     columns: Array,
     rows: Array,
+    sortMarker: Object,
   },
   data() {
     return {
@@ -264,6 +267,11 @@ module.exports = {
   .fixed-table-container th:focus {
     outline: 0;
     box-shadow: inset 0 0 0 2px $blue-40;
+  }
+  .fixed-table-container th span.sort-marker {
+    color: $blue-50;
+    font-weight: 700;
+    margin-left: $ws-xs;
   }
 
   /**

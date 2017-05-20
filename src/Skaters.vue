@@ -47,8 +47,9 @@
         </div>
       </div>
     </div>
-    <DataTable v-show="rows && rows.length > 0" v-on:thClick="setSort"
-      :rows="filteredRows" :columns="columns"></DataTable>
+    <DataTable v-show="rows && rows.length > 0" @thClick="setSort"
+      :rows="filteredRows" :columns="columns"
+      :sortMarker="{ col: sortCol, order: sortOrder }"></DataTable>
   </div>
 </template>
 
