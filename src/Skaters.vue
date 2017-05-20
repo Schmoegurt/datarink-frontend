@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100%; position: relative;">
+  <div style="height: calc(100% - 48px); padding-top: 16px; box-sizing: border-box; position: relative;">
     <h3>Skaters</h3>
     <div v-show="rows && rows.length > 0">
       <div class="form-group">

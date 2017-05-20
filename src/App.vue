@@ -89,7 +89,6 @@
   nav {
     border-bottom: 1px solid $gray-10;
     padding-bottom: ($ws-md - 1);
-    margin-bottom: $ws-lg;
   }
 
   nav > * {
