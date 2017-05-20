@@ -1,10 +1,10 @@
 <template>
   <div style="height: 100%; position: relative;">
     <h3>Skaters</h3>
-    <div>
+    <div v-show="rows && rows.length > 0">
       <div class="form-group">
         <label>Name</label>
-        <input type="text" v-model="nameDebounced" style="width: 94px;">
+        <input type="text" v-model="nameDebounced" style="width: 78px;">
       </div
       ><div class="form-group">
         <label>Pos</label>
@@ -34,7 +34,7 @@
       </div
       ><div class="form-group">
         <label>Minutes</label>
-        <input type="number" style="width: 70px;" v-model.number="toiDebounced">
+        <input type="number" style="width: 62px;" v-model.number="toiDebounced">
       </div
       ><div class="form-group">
         <div class="checkbox-group">
@@ -47,7 +47,8 @@
         </div>
       </div>
     </div>
-    <DataTable v-on:thClick="setSort" :rows="filteredRows" :columns="columns"></DataTable>
+    <DataTable v-show="rows && rows.length > 0" v-on:thClick="setSort"
+      :rows="filteredRows" :columns="columns"></DataTable>
   </div>
 </template>
 
