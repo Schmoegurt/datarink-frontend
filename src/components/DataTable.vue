@@ -5,7 +5,7 @@
         <thead>
           <tr>
             <th v-for="c in columns" :class="{ 'left-aligned': c.leftAligned }"
-              @click="emitThClick(c)"
+              tabindex="0" @click="emitThClick(c)" @keyup.enter="emitThClick(c)"
             >{{ c.display }}</th>
           </tr>
         </thead>
@@ -60,6 +60,12 @@ module.exports = {
     },
     pageCount() {
       return Math.ceil(this.rows.length / this.pageSize);
+    },
+  },
+  watch: {
+    rows() {
+      // Reset page number when rows change (e.g., from filters and sorting)
+      this.pageNum = 1;
     },
   },
   mounted() {
@@ -241,6 +247,23 @@ module.exports = {
   }
   .fixed-table-container tbody tr:hover td {
     background: $gray-1;
+  }
+
+  /**
+   * th sort effects
+   */
+  .fixed-table-container th {
+    cursor: pointer;
+  }
+  .fixed-table-container th:hover {
+    background: $gray-10;
+  }
+  .fixed-table-container th:active {
+    background: $gray-20;
+  }
+  .fixed-table-container th:focus {
+    outline: 0;
+    box-shadow: inset 0 0 0 2px $blue-40;
   }
 
   /**
