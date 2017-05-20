@@ -140,7 +140,7 @@ module.exports = {
     teams() {
       const uniqTeams = this.rows.reduce((result, cur) => {
         cur.teams.forEach((team) => {
-          if (result.indexOf(team) < 0) {
+          if (!result.includes(team)) {
             result.push(team);
           }
         });
@@ -152,7 +152,7 @@ module.exports = {
       return this.rows.filter((r) => {
         let returned = true;
         if (this.nameQuery) {
-          returned = r.name.toLowerCase().indexOf(this.nameQuery) >= 0;
+          returned = r.name.toLowerCase().includes(this.nameQuery);
         }
 
         if (returned && this.toiQuery) {
@@ -163,17 +163,17 @@ module.exports = {
           returned = r.gp >= this.gpQuery;
         }
 
-        if (this.teamQuery) {
-          returned = r.teams.indexOf(this.teamQuery) >= 0;
+        if (returned && this.teamQuery) {
+          returned = r.teams.includes(this.teamQuery);
         }
 
         if (returned && this.posQuery) {
           if (this.posQuery === 'f') {
-            returned = r.positions.indexOf('c') >= 0
-              || r.positions.indexOf('l') >= 0
-              || r.positions.indexOf('r') >= 0;
+            returned = r.positions.includes('c')
+              || r.positions.includes('l')
+              || r.positions.includes('r');
           } else {
-            returned = r.positions.indexOf(this.posQuery) >= 0;
+            returned = r.positions.includes(this.posQuery);
           }
         }
         return returned;
